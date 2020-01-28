@@ -76,18 +76,18 @@ namespace Frends.Cassandra
     public class CassandraTask
     {
 
-        public static JObject ExecuteQuery(CassandraInput input, Options options, Connection connection)
+        public static JToken ExecuteQuery(CassandraInput input, Options options, Connection connection)
         {
 
             ISession session = GetCassandraDatabase(connection.Nodes, connection.Port, connection.Username, connection.Password);
 
-            RowSet rowset = executeQuery(session, input.Query);
+            RowSet rowset = ApplyQueryToSession(session, input.Query);
 
-            return JObject.FromObject(rowset);
+            return new JArray(rowset);
 
         }
 
-        private static ISession GetCassandraDatabase(string Nodes, int ServerPort, string Username, string Password)
+        protected static ISession GetCassandraDatabase(string Nodes, int ServerPort, string Username, string Password)
         {
             // Establish the connection:
             // Plaintext auth
@@ -98,7 +98,7 @@ namespace Frends.Cassandra
             return session;
         }
 
-        private static RowSet executeQuery(ISession session, string query)
+        protected static RowSet ApplyQueryToSession(ISession session, string query)
         {
             var result = session.Execute(query);
 
