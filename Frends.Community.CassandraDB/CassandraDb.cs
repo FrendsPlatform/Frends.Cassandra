@@ -53,6 +53,7 @@ namespace Frends.Cassandra
         /// <summary>
         /// Database user password
         /// </summary>
+        [PasswordPropertyText]
         [DefaultValue("Password")]
         public string Password { get; set; }
 
