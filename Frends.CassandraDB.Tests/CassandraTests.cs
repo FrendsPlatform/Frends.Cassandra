@@ -14,7 +14,7 @@ namespace Frends.CassandraDB.Tests
     public class CassandraTaskHelper : CassandraTask
     {
 
-        public virtual ISession GetCassandraDatabaseWrapper(string Nodes, int ServerPort, string Username, string Password)
+        public virtual ISession GetCassandraDatabaseWrapper(string nodes, int serverPort, string username, string password)
         {
             //return CassandraTask.GetCassandraDatabase(Nodes, ServerPort, Username, Password);
             return null;
@@ -30,11 +30,11 @@ namespace Frends.CassandraDB.Tests
         public virtual JToken ExecuteQueryWrapper(CassandraInput input, Options options, Connection connection)
         {
 
-            ISession session = GetCassandraDatabaseWrapper(connection.Nodes, connection.Port, connection.Username, connection.Password);
+            ISession session = GetCassandraDatabaseWrapper(connection.nodes, connection.port, connection.username, connection.password);
 
-            RowSet rowset = ApplyQueryToSessionWrapper(session, input.Query);
+            RowSet rowSet = ApplyQueryToSessionWrapper(session, input.query);
 
-            return new JArray(rowset);
+            return new JArray(rowSet);
 
         }
     }
@@ -50,13 +50,13 @@ namespace Frends.CassandraDB.Tests
             jobject.Add("result", "1234");
 
             var input = new CassandraInput();
-            input.Query = "test query";
+            input.query = "test query";
             var options = new Options();
             var connection = new Connection();
-            connection.Nodes = "testaddress";
-            connection.Port = 70001;
-            connection.Username = "test user";
-            connection.Password = "test password";
+            connection.nodes = "testaddress";
+            connection.port = 70001;
+            connection.username = "test user";
+            connection.password = "test password";
             
 
             var mock = new Mock<CassandraTaskHelper>();

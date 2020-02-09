@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <AssemblyName>Frends.Cassandra</AssemblyName>
+    <RootNamespace>Frends.Cassandra</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DocumentationFile>C:\Users\rajalel\source\repos\Frends.Community.CassandraDB\Frends.Community.CassandraDB\Frends.CassandraDB.xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

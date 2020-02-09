@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.CassandraDB", "Frends.Community.CassandraDB\Frends.CassandraDB.csproj", "{47B1204F-E146-4696-9DDA-D1D31443BBBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Cassandra", "Frends.Community.CassandraDB\Frends.Cassandra.csproj", "{47B1204F-E146-4696-9DDA-D1D31443BBBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frends.CassandraDB.Tests", "Frends.CassandraDB.Tests\Frends.CassandraDB.Tests.csproj", "{78B01251-ADA7-4A53-905A-3B02583D61A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Cassandra.Tests", "Frends.CassandraDB.Tests\Frends.Cassandra.Tests.csproj", "{78B01251-ADA7-4A53-905A-3B02583D61A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -9,13 +9,14 @@ using Cassandra;
 using Newtonsoft.Json.Linq;
 using Dse.Auth;
 using System.Threading;
+using System.Linq;
 
 namespace Frends.Cassandra
 {
     public class Parameter
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
+        public string name { get; set; }
+        public string value { get; set; }
     }
 
     public class CassandraInput
@@ -24,11 +25,11 @@ namespace Frends.Cassandra
         /// Command timeout in seconds
         /// </summary>
         [DisplayFormat(DataFormatString = "Cql")]
-        public string Query { get; set; }
+        public string query { get; set; }
         /// <summary>
         /// Parameters for query.
         /// </summary>
-        public Parameter[] Parameters { get; set; }
+        public Parameter[] parameters { get; set; }
 
     }
 
@@ -38,7 +39,7 @@ namespace Frends.Cassandra
         /// Command timeout in seconds
         /// </summary>
         [DefaultValue(60)]
-        public int CommandTimeoutSeconds { get; set; }
+        public int commandTimeoutSeconds { get; set; }
 
     }
 
@@ -48,26 +49,26 @@ namespace Frends.Cassandra
         /// Database user username
         /// </summary>
         [DefaultValue("Username")]
-        public string Username { get; set; }
+        public string username { get; set; }
 
         /// <summary>
         /// Database user password
         /// </summary>
         [PasswordPropertyText]
         [DefaultValue("Password")]
-        public string Password { get; set; }
+        public string password { get; set; }
 
         /// <summary>
         /// Database port
         /// </summary>
         [DefaultValue(7000)]
-        public int Port { get; set; }
+        public int port { get; set; }
 
         /// <summary>
         /// IP address
         /// </summary>
         [DefaultValue("127.0.0.1")]
-        public string Nodes { get; set; }
+        public string nodes { get; set; }
 
     }
 
@@ -77,23 +78,23 @@ namespace Frends.Cassandra
     public class CassandraTask
     {
 
-        public static JToken ExecuteQuery(CassandraInput input, Options options, Connection connection)
+        public static JToken ExecuteQuery([PropertyTab] CassandraInput input, [PropertyTab] Options options, [PropertyTab] Connection connection)
         {
 
-            ISession session = GetCassandraDatabase(connection.Nodes, connection.Port, connection.Username, connection.Password);
+            ISession session = GetCassandraDatabase(connection.nodes, connection.port, connection.username, connection.password);
 
-            RowSet rowset = ApplyQueryToSession(session, input.Query);
+            RowSet rowSet = ApplyQueryToSession(session, input.query);
 
-            return new JArray(rowset);
+            return new JArray(rowSet);
 
         }
 
-        protected static ISession GetCassandraDatabase(string Nodes, int ServerPort, string Username, string Password)
+        protected static ISession GetCassandraDatabase(string nodes, int serverPort, string username, string password)
         {
             // Establish the connection:
             // Plaintext auth
-            var authProvider = new PlainTextAuthProvider(Username, Password);
-            var cluster = Cluster.Builder().AddContactPoints(Nodes).WithPort(ServerPort).WithAuthProvider(authProvider).Build();
+            var authProvider = new PlainTextAuthProvider(username, password);
+            var cluster = Cluster.Builder().AddContactPoints(nodes).WithPort(serverPort).WithAuthProvider(authProvider).Build();
             ISession session = cluster.Connect();
 
             return session;
@@ -106,7 +107,7 @@ namespace Frends.Cassandra
             return result;
         }
 
-        public class Cql
+        public class CassandraUtils
         {
             /// <summary>
             /// Execute a cql query.
@@ -114,26 +115,23 @@ namespace Frends.Cassandra
             /// <param name="input">Input parameters</param>
             /// <param name="options">Optional parameters with default values</param>
             /// <returns>JToken</returns>
-            public static async Task<object> ExecuteQuery(CassandraInput input, Connection connection, CancellationToken cancellationToken, Parameter[] parameters)
+            public static async Task<object> ExecuteCqlQuery([PropertyTab] CassandraInput input, [PropertyTab] Connection connection, [PropertyTab] Parameter[] parameter, CancellationToken cancellationToken)
             {
-                return await GetCassandraResult(input, connection, cancellationToken, parameters).ConfigureAwait(false);
+                return await GetCassandraResult(input, connection, parameter, cancellationToken).ConfigureAwait(false);
 
-                //input.Query, input.ConnectionString, input.Parameters, options, SqlCommandType.Text, cancellationToken).ConfigureAwait(false);
-                //string query, string connectionString, IEnumerable<Parameter> parameters, Options options, SqlCommandType commandType, CancellationToken cancellationToken
+               
 
             }
 
-            //----------------
-
-            private static async Task<JToken> GetCassandraResult(CassandraInput input, Connection connection, CancellationToken cancellationToken, Parameter[] parameters)
+            private static async Task<JToken> GetCassandraResult([PropertyTab] CassandraInput input, [PropertyTab] Connection connection, [PropertyTab] Parameter[] parameters, [PropertyTab] CancellationToken cancellationToken)
             {
-                var authProvider = new PlainTextAuthProvider(connection.Username, connection.Password);
-                var cluster = Cluster.Builder().AddContactPoints(connection.Nodes).WithPort(connection.Port).WithAuthProvider(authProvider).Build();
+                var authProvider = new PlainTextAuthProvider(connection.username, connection.password);
+                var cluster = Cluster.Builder().AddContactPoints(connection.nodes).WithPort(connection.port).WithAuthProvider(authProvider).Build();
 
                 using (ISession session = cluster.Connect())
                 {
-                    IDictionary<string, object> paramdict = ParameterToDictionary(parameters);
-                    IStatement statement = new SimpleStatement(paramdict, input.Query);
+                    IDictionary<string, object> paramDict = parameters.ToDictionary(param => param.name, param => (object)param.value);
+                    IStatement statement = new SimpleStatement(paramDict, input.query);
                     var rs = await session.ExecuteAsync(statement);
 
                     return JToken.FromObject(rs);
@@ -144,10 +142,7 @@ namespace Frends.Cassandra
             {
                 Dictionary<string, object> dict = new Dictionary<string, object>();
 
-                foreach (var parameter in parameters)
-                {
-                    dict.Add(parameter.Name, parameter.Value);
-                }
+                
 
                 return dict;
             }
