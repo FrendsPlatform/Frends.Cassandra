@@ -24,7 +24,7 @@ namespace Frends.Cassandra
         /// <summary>
         /// Command timeout in seconds
         /// </summary>
-        [DisplayFormat(DataFormatString = "Cql")]
+        [DisplayFormat(DataFormatString = "Sql")]
         public string query { get; set; }
         /// <summary>
         /// Parameters for query.
