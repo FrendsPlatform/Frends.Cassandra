@@ -19,7 +19,7 @@ Rebuild the project
 
 Run tests
  
-`docker network create cassandra && docker run --rm -d -p 9042:9042 --hostname cassandra --network cassandra cassandra:4`
+`docker run --rm -d -p 9042:9042 cassandra:4`
 
 `dotnet test`
 

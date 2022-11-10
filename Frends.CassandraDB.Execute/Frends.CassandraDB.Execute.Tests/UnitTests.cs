@@ -7,9 +7,9 @@ namespace Frends.CassandraDB.Execute.Tests;
 public class UnitTests
 {
     /* 
-     * docker network create cassandra && docker run --rm -d -p 9042:9042 --hostname cassandra --network cassandra cassandra:4
+     * docker run --rm -d -p 9042:9042 cassandra:4
      * 
-     * Run Test_Execute_Insert() OR following command to build up test DB.
+     * (Optional) Run following command in \Frends.CassandraDB.Execute.Tests\Files\ to build up test DB. 
      * docker run --rm --network cassandra -v "$(pwd)/data.cql:/scripts/data.cql" -e CQLSH_HOST=cassandra -e CQLSH_PORT=9042 -e CQLVERSION=3.4.5 nuvo/docker-cqlsh
      * Note: It might take some time to get Cassandra running, so this command might fail. Wait for ~20sec and try again.
      * 
@@ -26,10 +26,10 @@ public class UnitTests
     */
 
     /// <summary>
-    /// Creating testing DB. Sleep(30000) because it might take a while to start fresh Cassandra DB (docker / Workflow)
+    /// Creating testing DB. Sleep(40000) because it might take a while to start a fresh Cassandra DB (docker / Workflow)
     /// </summary>
-    [TestMethod]
-    public void Test_Execute_Insert()
+    [TestInitialize]
+    public void Startup()
     {
         Thread.Sleep(40000); //For first run. Can be commented out.
 
@@ -37,7 +37,28 @@ public class UnitTests
         {
             "CREATE KEYSPACE IF NOT EXISTS store WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : '1' };",
             "CREATE TABLE IF NOT EXISTS store.shopping_cart (userid text PRIMARY KEY,item_count int,last_update_timestamp timestamp);",
-            "INSERT INTO store.shopping_cart(userid, item_count, last_update_timestamp)VALUES ('9876', 2, toTimeStamp(now()));",
+            "INSERT INTO store.shopping_cart(userid, item_count, last_update_timestamp)VALUES ('9876', 2, toTimeStamp(now()));"
+        };
+
+        foreach (var query in queries)
+        {
+            var _input = new Input()
+            {
+                ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
+                Keyspace = null,
+                Port = 9042,
+                Query = query,
+            };
+
+            CassandraDB.Execute(_input, default);
+        }
+    }
+
+    [TestMethod]
+    public void Test_Execute_Insert()
+    {
+        var queries = new List<string>()
+        {
             "INSERT INTO store.shopping_cart(userid, item_count, last_update_timestamp)VALUES ('1234', 5, toTimeStamp(now()));",
         };
 
@@ -45,7 +66,7 @@ public class UnitTests
         {
             var _input = new Input()
             {
-                ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
+                ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
                 Keyspace = null,
                 Port = 9042,
                 Query = query,
@@ -62,7 +83,7 @@ public class UnitTests
     {
         var _input = new Input()
         {
-            ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
+            ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
             Keyspace = null,
             Port = 9042,
             Query = "SELECT * FROM store.shopping_cart;",
@@ -70,6 +91,6 @@ public class UnitTests
 
         var result = CassandraDB.Execute(_input, default);
         Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.QueryResults.Length > 0);
+        Assert.IsTrue(!string.IsNullOrWhiteSpace(result.QueryResults));
     }
 }

@@ -13,7 +13,7 @@ jobs:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_test.yml@main
     with:
       workdir: Frends.CassandraDB.Execute
-      prebuild_command: docker network create cassandra && docker run --rm -d -p 9042:9042 --hostname cassandra --network cassandra cassandra:4
+      prebuild_command: docker run --rm -d -p 9042:9042 cassandra:4
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
       test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
