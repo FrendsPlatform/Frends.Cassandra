@@ -7,9 +7,7 @@ namespace Frends.CassandraDB.Execute.Tests;
 public class UnitTests
 {
     /* 
-     * docker network create cassandra 
-     * 
-     * docker run --rm -d -p 9042:9042 --hostname cassandra --network cassandra cassandra 4
+     * docker network create cassandra && docker run --rm -d -p 9042:9042 --hostname cassandra --network cassandra cassandra 4
      * 
      * Run Test_Execute_Insert() OR following command to build up test DB.
      * docker run --rm --network cassandra -v "$(pwd)/data.cql:/scripts/data.cql" -e CQLSH_HOST=cassandra -e CQLSH_PORT=9042 -e CQLVERSION=3.4.5 nuvo/docker-cqlsh
