@@ -66,7 +66,7 @@ public class UnitTests
         {
             var _input = new Input()
             {
-                ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
+                ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
                 Keyspace = null,
                 Port = 9042,
                 Query = query,
@@ -83,7 +83,7 @@ public class UnitTests
     {
         var _input = new Input()
         {
-            ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
+            ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
             Keyspace = null,
             Port = 9042,
             Query = "SELECT * FROM store.shopping_cart;",
