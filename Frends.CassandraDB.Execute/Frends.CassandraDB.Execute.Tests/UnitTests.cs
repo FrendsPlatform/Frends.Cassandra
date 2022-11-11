@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Frends.CassandraDB.Execute.Definitions;
+using Cassandra;
 
 namespace Frends.CassandraDB.Execute.Tests;
 
@@ -31,8 +32,6 @@ public class UnitTests
     [TestInitialize]
     public void Startup()
     {
-        Thread.Sleep(40000); //For first run. Can be commented out.
-
         var queries = new List<string>()
         {
             "CREATE KEYSPACE IF NOT EXISTS store WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : '1' };",
@@ -42,6 +41,8 @@ public class UnitTests
 
         foreach (var query in queries)
         {
+            var tryConnect = true;
+            var interruptCounter = 0;
             var _input = new Input()
             {
                 ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
@@ -50,7 +51,21 @@ public class UnitTests
                 Query = query,
             };
 
-            CassandraDB.Execute(_input, default);
+            // After test container is started it might take same time before the DB is ready.
+            // This loop will try 10 times in 10s intervals before failing tests.
+            while(tryConnect && interruptCounter < 10)
+            {
+                try
+                {
+                    CassandraDB.Execute(_input, default);
+                    tryConnect = false;
+                }
+                catch
+                {
+                    interruptCounter++;
+                    Thread.Sleep(10000);
+                }
+            }
         }
     }
 
