@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Frends.CassandraDB.Execute.Definitions;
-using Cassandra;
 
 namespace Frends.CassandraDB.Execute.Tests;
 
@@ -8,6 +7,7 @@ namespace Frends.CassandraDB.Execute.Tests;
 public class UnitTests
 {
     /* 
+     * docker network create cassandra
      * docker run --rm -d -p 9042:9042 cassandra:4
      * 
      * (Optional) Run following command in \Frends.CassandraDB.Execute.Tests\Files\ to build up test DB. 
@@ -89,7 +89,7 @@ public class UnitTests
 
             var result = CassandraDB.Execute(_input, default);
             Assert.IsTrue(result.Success);
-            Assert.IsTrue(result.QueryResults.Equals("{}"));
+            Assert.AreEqual(result.QueryResults, "{}");
         }
     }
 
@@ -106,6 +106,6 @@ public class UnitTests
 
         var result = CassandraDB.Execute(_input, default);
         Assert.IsTrue(result.Success);
-        Assert.IsTrue(!string.IsNullOrWhiteSpace(result.QueryResults));
+        Assert.IsTrue(result.QueryResults != null);
     }
 }
