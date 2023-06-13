@@ -34,7 +34,7 @@ public class CassandraDB
         {
             var statement = string.IsNullOrWhiteSpace(input.AsUser) ? new SimpleStatement(input.Query) : new SimpleStatement(input.Query).ExecutingAs(input.AsUser);
             var rs = cluster.Execute(statement);
-            int count = 0;
+            var count = 0;
 
             foreach (var i in rs)
             {
