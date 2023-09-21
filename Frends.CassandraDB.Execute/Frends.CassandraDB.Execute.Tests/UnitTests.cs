@@ -43,15 +43,16 @@ public class UnitTests
         {
             var tryConnect = true;
             var interruptCounter = 0;
-            var _input = new Input()
+            var _input = new Input
             {
-                ContactPoints = new[] { new ContactPoint() { Value = "localhost" } },
+                ContactPoints = new[] { new ContactPoint { Value = "localhost" } },
                 Keyspace = null,
                 Port = 9042,
                 Query = query,
             };
 
-            // After test container is started it might take same time before the DB is ready.
+            // After test container is started (in GitHub actions) it might take
+            // same time before the DB is ready.
             // This loop will try 10 times in 10s intervals before failing tests.
             while(tryConnect && interruptCounter < 10)
             {
@@ -59,7 +60,7 @@ public class UnitTests
                 {
                     CassandraDB.Execute(_input, default);
                     tryConnect = false;
-                    return;
+                    break;
                 }
                 catch
                 {
