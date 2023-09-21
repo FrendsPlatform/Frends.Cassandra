@@ -52,7 +52,7 @@ public class CassandraDB
                 foreach (var w in rs.Info.Warnings)
                     warnings.Add(w.ToString());
 
-            return new Result(rs.IsFullyFetched, JObject.Parse(queryResult.ToString()), warnings.Count > 0 ? warnings : null);
+            return new Result(rs.IsFullyFetched, JToken.FromObject(queryResult), warnings.Count > 0 ? warnings : null);
         }
         catch (CqlArgumentException ex)
         {

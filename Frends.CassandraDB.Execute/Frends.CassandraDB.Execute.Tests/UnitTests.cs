@@ -59,11 +59,13 @@ public class UnitTests
                 {
                     CassandraDB.Execute(_input, default);
                     tryConnect = false;
+                    return;
                 }
                 catch
                 {
                     interruptCounter++;
                     Thread.Sleep(10000);
+                    Console.WriteLine($"Cassandra DB not ready yet. Waiting for 10s. {interruptCounter}/10");
                 }
             }
         }
@@ -89,7 +91,7 @@ public class UnitTests
 
             var result = CassandraDB.Execute(_input, default);
             Assert.IsTrue(result.Success);
-            Assert.AreEqual(result.QueryResults, "{}");
+            Assert.AreEqual(result.QueryResults.ToString(), "{}");
         }
     }
 

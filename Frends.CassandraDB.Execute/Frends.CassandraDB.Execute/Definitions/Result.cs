@@ -18,7 +18,7 @@ public class Result
     /// Query results. Only SELECT query contain values.
     /// </summary>
     /// <example>{\"0\":[{\"Key\":\"foo\",\"Value\":\"bar\"}],\"1\":[{\"Key\":\"foo2\",\"Value\":\"bar2\"}]}</example>
-    public JObject QueryResults { get; private set; }
+    public JToken QueryResults { get; private set; }
 
     /// <summary>
     /// Returns the server-side warnings for this query.
@@ -27,7 +27,7 @@ public class Result
     /// <example>Object{foo}</example>
     public List<string> Warnings { get; private set; }
 
-    internal Result(bool success, JObject queryResults, List<string> warnings)
+    internal Result(bool success, JToken queryResults, List<string> warnings)
     {
         Success = success;
         QueryResults = queryResults;
