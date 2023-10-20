@@ -54,7 +54,7 @@ public class ExecuteTaskTests
             // After test container is started (in GitHub actions) it might take
             // same time before the DB is ready.
             // This loop will try 10 times in 10s intervals before failing tests.
-            while(tryConnect && interruptCounter < 10)
+            while (tryConnect && interruptCounter < 10)
             {
                 try
                 {
