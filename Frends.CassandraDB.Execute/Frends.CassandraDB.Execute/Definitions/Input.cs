@@ -87,7 +87,6 @@ public class Input
         return new X509Certificate2Collection {
             new (X509CertificateFilePath, X509CertificatePassword) };
     }
-    
 }
 
 /// <summary>
