@@ -24,7 +24,7 @@ public class Result
     /// Returns the server-side warnings for this query.
     /// This feature is only available for Cassandra 2.2 or above; with lower versions, this property always returns null.
     /// </summary>
-    /// <example>Object{foo}</example>
+    /// <example>List { "warning1", "warning2" }</example>
     public List<string> Warnings { get; private set; }
 
     internal Result(bool success, JToken queryResults, List<string> warnings)

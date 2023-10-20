@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Frends.CassandraDB.Execute\Frends.CassandraDB.Execute.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestResults\" />
+  </ItemGroup>
+
 </Project>

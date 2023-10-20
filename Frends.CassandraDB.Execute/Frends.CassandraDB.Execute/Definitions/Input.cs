@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Frends.CassandraDB.Execute.Definitions;
 
@@ -27,7 +28,7 @@ public class Input
     /// </summary>
     /// <example>c:\temp</example>
     [UIHint(nameof(UseSsl), "", true)]
-    public string X509Certificate { get; set; }
+    public string X509CertificateFilePath { get; set; }
 
     /// <summary>
     /// X509 certificate's password.
@@ -80,6 +81,13 @@ public class Input
     /// </summary>
     /// <example>SELECT bar FROM foo</example>
     public string Query { get; set; }
+
+    internal X509Certificate2Collection CreateCertificate()
+    {
+        return new X509Certificate2Collection {
+            new (X509CertificateFilePath, X509CertificatePassword) };
+    }
+    
 }
 
 /// <summary>

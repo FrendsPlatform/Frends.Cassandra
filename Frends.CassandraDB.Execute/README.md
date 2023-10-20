@@ -18,10 +18,12 @@ Rebuild the project
 `dotnet build`
 
 Run tests
- 
-`docker run --rm -d -p 9042:9042 cassandra:4`
 
-`dotnet test`
+```
+cd Frends.CassandraDB.Execute.Tests`
+docker-compose up -d
+dotnet test
+```
 
 
 Create a NuGet package

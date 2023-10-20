@@ -4,7 +4,7 @@ using Frends.CassandraDB.Execute.Definitions;
 namespace Frends.CassandraDB.Execute.Tests;
 
 [TestClass]
-public class UnitTests
+public class ExecuteTaskTests
 {
     /* 
      * docker network create cassandra
@@ -109,6 +109,24 @@ public class UnitTests
 
         var result = CassandraDB.Execute(_input, default);
         Assert.IsTrue(result.Success);
+        Assert.IsTrue(result.QueryResults != null);
+    }
+
+    [TestMethod]
+    public void Test_Execute_Warnings()
+    {
+        var _input = new Input()
+        {
+            ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
+            Keyspace = null,
+            Port = 9042,
+            Query = "SELECT count(*) FROM store.shopping_cart;",
+        };
+
+        var result = CassandraDB.Execute(_input, default);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(1, result.Warnings.Count);
+        Assert.AreEqual("Aggregation query used without partition key", result.Warnings[0]);
         Assert.IsTrue(result.QueryResults != null);
     }
 }

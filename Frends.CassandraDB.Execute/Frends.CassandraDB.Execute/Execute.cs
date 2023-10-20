@@ -4,10 +4,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using Cassandra;
-using Cassandra.Data.Linq;
-using Newtonsoft.Json;
 using Cassandra.DataStax.Auth;
-using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json.Linq;
 
 namespace Frends.CassandraDB.Execute;
@@ -51,8 +48,10 @@ public class CassandraDB
             }
 
             if (rs.Info.Warnings != null)
+            {
                 foreach (var w in rs.Info.Warnings)
                     warnings.Add(w.ToString());
+            }
 
             return new Result(
                 rs.IsFullyFetched,
@@ -67,59 +66,45 @@ public class CassandraDB
 
     private static ISession GetCluster(Input input)
     {
-        Cluster cluster;
-
-        try
+        var builder = Cluster
+            .Builder()
+            .AddContactPoints(GetContactPoints(input))
+            .WithPort(input.Port);
+        switch (input.AuthenticationMethods)
         {
-            switch (input.AuthenticationMethods)
-            {
-                case AuthenticationMethods.None:
-                    if (input.UseSsl)
-                        cluster = Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port)
-                            .WithSSL(new SSLOptions().SetCertificateCollection(new X509Certificate2Collection { new X509Certificate2(@$"{input.X509Certificate}", input.X509CertificatePassword) })).Build();
-                    else
-                        cluster = Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).Build();
-                    break;
+            case AuthenticationMethods.None:
+                // The builder is already configured enough
+                break;
 
-                case AuthenticationMethods.PlainTextAuthProvider:
-                    if (input.UseSsl)
-                        cluster = Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).WithCredentials(input.Username, input.Password)
-                            .WithSSL(new SSLOptions().SetCertificateCollection(new X509Certificate2Collection { new X509Certificate2(@$"{input.X509Certificate}", input.X509CertificatePassword) })).Build();
-                    else
-                        cluster = Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).WithCredentials(input.Username, input.Password).Build();
-                    break;
+            case AuthenticationMethods.PlainTextAuthProvider:
+                builder = builder.WithCredentials(input.Username, input.Password);
+                break;
 
-                case AuthenticationMethods.DsePlainTextAuthProvider:
-                    if (input.UseSsl)
-                        cluster = string.IsNullOrWhiteSpace(input.AsUser)
-                        ? Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).WithAuthProvider(new DsePlainTextAuthProvider(input.Username, input.Password))
-                            .WithSSL(new SSLOptions().SetCertificateCollection(new X509Certificate2Collection { new X509Certificate2(@$"{input.X509Certificate}", input.X509CertificatePassword) })).Build()
-                        : Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).WithAuthProvider(new DsePlainTextAuthProvider(input.Username, input.Password, input.AsUser))
-                            .WithSSL(new SSLOptions().SetCertificateCollection(new X509Certificate2Collection { new X509Certificate2(@$"{input.X509Certificate}", input.X509CertificatePassword) })).Build();
-                    else
-                        cluster = string.IsNullOrWhiteSpace(input.AsUser)
-                        ? Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).WithAuthProvider(new DsePlainTextAuthProvider(input.Username, input.Password)).Build()
-                        : Cluster.Builder().AddContactPoints(GetContactPoints(input)).WithPort(input.Port).WithAuthProvider(new DsePlainTextAuthProvider(input.Username, input.Password, input.AsUser)).Build();
-                    break;
-                default:
-                    throw new Exception("GetCluster error: Authentication method not supported.");
-            }
+            case AuthenticationMethods.DsePlainTextAuthProvider:
+                var dsePlainTextAuthProvider = string.IsNullOrWhiteSpace(input.AsUser)
+                    ? new DsePlainTextAuthProvider(input.Username, input.Password)
+                    : new DsePlainTextAuthProvider(input.Username, input.Password, input.AsUser);
+                builder = builder.WithAuthProvider(dsePlainTextAuthProvider);
+                break;
 
-            var session = string.IsNullOrWhiteSpace(input.Keyspace)
-                        ? cluster.Connect()
-                        : cluster.Connect(input.Keyspace);
-
-            return session;
-
+            default:
+                throw new Exception("GetCluster error: Authentication method not supported.");
         }
-        catch (CqlArgumentException ex)
+
+        if (input.UseSsl)
         {
-            throw new Exception($"GetCluster error (CqlArgumentException): {ex}");
+            var cert = input.CreateCertificate();
+            var ssl = new SSLOptions().SetCertificateCollection(cert);
+            builder = builder.WithSSL(ssl);
         }
-        catch (Exception ex)
-        {
-            throw new Exception($"GetCluster error (Exception): {ex}");
-        }
+
+        var cluster = builder.Build();
+
+        var session = string.IsNullOrWhiteSpace(input.Keyspace)
+                    ? cluster.Connect()
+                    : cluster.Connect(input.Keyspace);
+
+        return session;
     }
 
     private static string[] GetContactPoints(Input input)
