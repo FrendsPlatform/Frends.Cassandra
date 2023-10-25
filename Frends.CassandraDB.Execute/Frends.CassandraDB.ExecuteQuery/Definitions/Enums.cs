@@ -1,4 +1,4 @@
-﻿namespace Frends.CassandraDB.Execute.Definitions;
+﻿namespace Frends.CassandraDB.ExecuteQuery.Definitions;
 
 /// <summary>
 /// Authentication methods.

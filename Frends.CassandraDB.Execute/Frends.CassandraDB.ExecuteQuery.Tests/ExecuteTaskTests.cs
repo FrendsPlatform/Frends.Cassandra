@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Frends.CassandraDB.Execute.Definitions;
+using Frends.CassandraDB.ExecuteQuery.Definitions;
 
-namespace Frends.CassandraDB.Execute.Tests;
+namespace Frends.CassandraDB.ExecuteQuery.Tests;
 
 [TestClass]
 public class ExecuteTaskTests
@@ -10,7 +10,7 @@ public class ExecuteTaskTests
      * docker network create cassandra
      * docker run --rm -d -p 9042:9042 cassandra:4
      * 
-     * (Optional) Run following command in \Frends.CassandraDB.Execute.Tests\Files\ to build up test DB. 
+     * (Optional) Run following command in \Frends.CassandraDB.ExecuteQuery.Tests\Files\ to build up test DB. 
      * docker run --rm --network cassandra -v "$(pwd)/data.cql:/scripts/data.cql" -e CQLSH_HOST=cassandra -e CQLSH_PORT=9042 -e CQLVERSION=3.4.5 nuvo/docker-cqlsh
      * Note: It might take some time to get Cassandra running, so this command might fail. Wait for ~20sec and try again.
      * 
@@ -32,7 +32,7 @@ public class ExecuteTaskTests
     [TestInitialize]
     public void Startup()
     {
-        var queries = new List<string>()
+        var queries = new List<string>
         {
             "CREATE KEYSPACE IF NOT EXISTS store WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : '1' };",
             "CREATE TABLE IF NOT EXISTS store.shopping_cart (userid text PRIMARY KEY,item_count int,last_update_timestamp timestamp);",
@@ -43,7 +43,7 @@ public class ExecuteTaskTests
         {
             var tryConnect = true;
             var interruptCounter = 0;
-            var _input = new Input
+            var input = new Input
             {
                 ContactPoints = new[] { new ContactPoint { Value = "localhost" } },
                 Keyspace = null,
@@ -58,7 +58,7 @@ public class ExecuteTaskTests
             {
                 try
                 {
-                    CassandraDB.Execute(_input, default);
+                    CassandraDB.ExecuteQuery(input, default);
                     tryConnect = false;
                     break;
                 }
@@ -75,58 +75,56 @@ public class ExecuteTaskTests
     [TestMethod]
     public void Test_Execute_Insert()
     {
-        var queries = new List<string>()
+        const string query =
+            "INSERT INTO " +
+            "store.shopping_cart(userid, item_count, last_update_timestamp)" +
+            "VALUES ('1234', 5, toTimeStamp(now()));";
+
+        var input = new Input
         {
-            "INSERT INTO store.shopping_cart(userid, item_count, last_update_timestamp)VALUES ('1234', 5, toTimeStamp(now()));",
+            ContactPoints = new[] { new ContactPoint { Value = "127.0.0.1" } },
+            Keyspace = null,
+            Port = 9042,
+            Query = query,
         };
 
-        foreach (var query in queries)
-        {
-            var _input = new Input()
-            {
-                ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
-                Keyspace = null,
-                Port = 9042,
-                Query = query,
-            };
-
-            var result = CassandraDB.Execute(_input, default);
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(result.QueryResults.ToString(), "{}");
-        }
+        var result = CassandraDB.ExecuteQuery(input, default);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(0, result.QueryResults.Count());
     }
 
     [TestMethod]
     public void Test_Execute_Select()
     {
-        var _input = new Input()
+        var input = new Input
         {
-            ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
+            ContactPoints = new[] { new ContactPoint { Value = "127.0.0.1" } },
             Keyspace = null,
             Port = 9042,
             Query = "SELECT * FROM store.shopping_cart;",
         };
 
-        var result = CassandraDB.Execute(_input, default);
+        var result = CassandraDB.ExecuteQuery(input, default);
         Assert.IsTrue(result.Success);
-        Assert.IsTrue(result.QueryResults != null);
+        Assert.IsNotNull(result.QueryResults);
+        Assert.AreEqual(2, result.QueryResults.Count());
     }
 
     [TestMethod]
     public void Test_Execute_Warnings()
     {
-        var _input = new Input()
+        var input = new Input
         {
-            ContactPoints = new[] { new ContactPoint() { Value = "127.0.0.1" } },
+            ContactPoints = new[] { new ContactPoint { Value = "127.0.0.1" } },
             Keyspace = null,
             Port = 9042,
             Query = "SELECT count(*) FROM store.shopping_cart;",
         };
 
-        var result = CassandraDB.Execute(_input, default);
+        var result = CassandraDB.ExecuteQuery(input, default);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(1, result.Warnings.Count);
         Assert.AreEqual("Aggregation query used without partition key", result.Warnings[0]);
-        Assert.IsTrue(result.QueryResults != null);
+        Assert.IsNotNull(result.QueryResults);
     }
 }

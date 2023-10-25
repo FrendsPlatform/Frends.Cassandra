@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Frends.CassandraDB.Execute.Definitions;
+namespace Frends.CassandraDB.ExecuteQuery.Definitions;
 
 /// <summary>
 /// Input parameters.

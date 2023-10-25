@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Data;
+using Newtonsoft.Json.Linq;
 
-namespace Frends.CassandraDB.Execute.Definitions;
+namespace Frends.CassandraDB.ExecuteQuery.Definitions;
 
 /// <summary>
 /// Task's result.
@@ -17,7 +18,7 @@ public class Result
     /// <summary>
     /// Query results. Only SELECT query contain values.
     /// </summary>
-    /// <example>{\"0\":[{\"Key\":\"foo\",\"Value\":\"bar\"}],\"1\":[{\"Key\":\"foo2\",\"Value\":\"bar2\"}]}</example>
+    /// <example>JToken</example>
     public JToken QueryResults { get; private set; }
 
     /// <summary>

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Frends.CassandraDB.Execute\Frends.CassandraDB.Execute.csproj" />
+    <ProjectReference Include="..\Frends.CassandraDB.ExecuteQuery\Frends.CassandraDB.ExecuteQuery.csproj" />
   </ItemGroup>
 
   <ItemGroup>

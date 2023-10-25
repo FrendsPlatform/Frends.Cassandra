@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Frends.CassandraDB.Execute.Definitions;
+using Frends.CassandraDB.ExecuteQuery.Definitions;
 
-namespace Frends.CassandraDB.Execute.Tests;
+namespace Frends.CassandraDB.ExecuteQuery.Tests;
 
 [TestClass]
 public class InputTests
