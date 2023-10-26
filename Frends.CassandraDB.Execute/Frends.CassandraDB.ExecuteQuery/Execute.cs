@@ -33,7 +33,7 @@ public static class CassandraDB
                 ? new SimpleStatement(input.Query)
                 : new SimpleStatement(input.Query).ExecutingAs(input.AsUser);
             var rowSet = cluster.Execute(statement);
-            
+
             var dataTable = CassandraRowSetToDataTable(rowSet);
 
             if (rowSet.Info.Warnings != null)
@@ -51,7 +51,7 @@ public static class CassandraDB
             cluster.ShutdownAsync().Wait(cancellationToken);
         }
     }
-    
+
     private static DataTable CassandraRowSetToDataTable(RowSet rowSet)
     {
         var dataTable = new DataTable();
