@@ -1,18 +1,18 @@
-name: Execute build main
+name: ExecuteQuery build main
 
 on:
   push:
     branches:    
       - master
     paths:
-      - 'Frends.CassandraDB.Execute/**'
+      - 'Frends.CassandraDB.ExecuteQuery/**'
   workflow_dispatch:
 
 jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/linux_build_main.yml@main
     with:
-      workdir: Frends.CassandraDB.Execute
+      workdir: Frends.CassandraDB.ExecuteQuery
       prebuild_command: docker run --rm -d -p 9042:9042 cassandra:4
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}

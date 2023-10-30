@@ -1,5 +1,5 @@
 # Changelog
 
-## [1.0.0] - 2022-11-19
+## [1.0.0] - 2023-10-30
 ### Added
 - Initial implementation

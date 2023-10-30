@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using Newtonsoft.Json.Linq;
 
 namespace Frends.CassandraDB.ExecuteQuery.Definitions;
